@@ -18,6 +18,7 @@ public class Elevator {
 	
 	public Request mainRequest = null;
 	public Request nextMainRequest = null;
+	public Request lastMainRequest = null;
 
 	Elevator() {
 		action = Action.FINISHED;

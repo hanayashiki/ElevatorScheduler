@@ -2,6 +2,7 @@ package elevatorScheduler;
 
 import jdk.internal.util.xml.impl.Input;
 
+import java.text.NumberFormat;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -23,9 +24,15 @@ public class Parser {
 		Matcher elevatorRequestMatcher = elevatorRequestPattern.matcher(requestLineTrimmed);
 		Request newRequest = null;
 		if (floorRequestMatcher.find()) {
-			int from = Integer.parseInt(floorRequestMatcher.group(1));
 			String directionString = floorRequestMatcher.group(2);
-			double time = Integer.parseInt(floorRequestMatcher.group(3));
+			int from;
+			double time;
+			try {
+				from = Integer.parseInt(floorRequestMatcher.group(1));
+				time = Integer.parseInt(floorRequestMatcher.group(3));
+			} catch (NumberFormatException e) {
+				throw new InputException(requestLine);
+			}
 			Direction direction = Direction.UP;
 			if (directionString.equals("DOWN")) {
 				direction = Direction.DOWN;
@@ -73,5 +80,15 @@ public class Parser {
 			return false;
 		}
 		return true;
+	}
+
+	public static String format(double d) {
+		NumberFormat NF = NumberFormat.getInstance();
+		NF.setGroupingUsed(false);
+		String str = NF.format(d);
+		if (!str.contains(".")) {
+			str += ".0";
+		}
+		return str;
 	}
 }
