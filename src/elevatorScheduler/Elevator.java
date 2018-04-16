@@ -17,11 +17,14 @@ public class Elevator {
 	public double simuTime = 0;
 	
 	public Request mainRequest = null;
-	public Request currentRequest = null;
 	public Request nextMainRequest = null;
 
 	Elevator() {
 		action = Action.FINISHED;
 		position = 1;
 	}
+
+    public double predictReachingTime(Request nextRequest) {
+	    return Math.abs(nextRequest.getTarget() - position) / SPEED + simuTime;
+    }
 }

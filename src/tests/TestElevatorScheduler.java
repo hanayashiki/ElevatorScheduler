@@ -15,7 +15,7 @@ public class TestElevatorScheduler {
 		
 		FileInputStream testFile = null;
 		try {
-			testFile = new FileInputStream("src/tests/testInputs/testOfficialPickUp.txt");
+			testFile = new FileInputStream("src/tests/testInputs/testPickUpQueue.txt");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

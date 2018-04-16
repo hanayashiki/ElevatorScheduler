@@ -47,14 +47,15 @@ public class Parser {
 			throw new InputException(requestLine);
 		}
 		this.lastTime = newRequest.time;
+		newRequest.order = index;
 		index++;
 		return newRequest;
 	}
 
 	public boolean checkSemantics(Request request) {
-		if (index == 0 && !(request.type == Request.Type.FR && request.time == 0.0)) {
-			return false;
-		}
+//		if (index == 0 && !(request.type == Request.Type.FR && request.time == 0.0)) {
+//			return false;
+//		}
 		if (request.getTarget() > Elevator.TOP_FLOOR || request.getTarget() < Elevator.BOTTOM_FLOOR) {
 			return false;
 		}
