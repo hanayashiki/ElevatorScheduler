@@ -73,9 +73,11 @@ public class ElevatorScheduler {
             if (status == Status.UP && request.getTarget() <= elevator.position) {
                 // System.out.println("denied 1: " + request);
                 // System.out.println(request.getTarget() + ", " + elevator.position);
+                index++;
                 continue;
             }
             if (status == Status.DOWN && request.getTarget() >= elevator.position) {
+                index++;
                 continue;
             }
             int predictPosition;
@@ -114,6 +116,7 @@ public class ElevatorScheduler {
             index++;
         }
         if (pickUp != null) {
+//          System.out.println("Remoeved: " + waitingList.get(minIndex));
             waitingList.remove(minIndex);
 //            System.out.println(pickUp);
 //            System.out.println("pickUp waitingList: " + waitingList);
@@ -126,7 +129,7 @@ public class ElevatorScheduler {
         // TODO: exception: INVALID
         while (true) {
             Request newRequest = getNextRequest();
-            System.out.println(newRequest);
+            // System.out.println(newRequest);
             if (newRequest == null) {
                 // indicates RUN
                 break;
@@ -134,20 +137,20 @@ public class ElevatorScheduler {
                 waitingList.add(newRequest);
             }
         }
-        System.out.println("-------------");
+        // System.out.println("-------------");
     }
 
     private void printRequestDealt(Request request, double time, Status status) {
 
         String deal = "(" + request.getTarget() + "," + status + "," + Parser.format(time) + ")";
         String out = request.toString() + "/" + deal;
-        System.out.println(out);
+        // System.out.println(out);
         standardOutputList.add(out);
     }
 
     private void printSameRequest(Request request) {
         String out = "#SAME " + request;
-        System.out.println(out);
+        // System.out.println(out);
         standardOutputList.add(out);
     }
 
@@ -157,18 +160,18 @@ public class ElevatorScheduler {
         }
     }
 
-    private void checkWaitingListForLifting(Request request) {
-        Iterator<Request> iterator = waitingList.iterator();
-        // System.out.println(waitingList);
-        while (iterator.hasNext()) {
-            Request check = iterator.next();
-            if (check.getTarget() == request.getTarget() && check.time < elevator.simuTime) {
-                iterator.remove();
-                // System.out.println("lifting:");
-                printRequestDealt(check, elevator.simuTime, status);
-            }
-        }
-    }
+//    private void checkWaitingListForLifting(Request request) {
+//        Iterator<Request> iterator = waitingList.iterator();
+//        // System.out.println(waitingList);
+//        while (iterator.hasNext()) {
+//            Request check = iterator.next();
+//            if (check.getTarget() == request.getTarget() && check.time < elevator.simuTime) {
+//                iterator.remove();
+//                // System.out.println("lifting:");
+//                printRequestDealt(check, elevator.simuTime, status);
+//            }
+//        }
+//    }
 
     Comparator comparatorOnFloor = new Comparator<Request>() {
         @Override
@@ -212,6 +215,7 @@ public class ElevatorScheduler {
         LinkedList<Request> pickUpQueue = new LinkedList<>();
         LinkedList<Request> groupFinished = new LinkedList<>();
         // System.out.println("Finding pick up for: " + elevator.mainRequest);
+        // System.out.println("one pick");
         while (true) {
             boolean newAdded = false;
             boolean newDealt = false;
@@ -228,8 +232,9 @@ public class ElevatorScheduler {
             }
             // deal with a request, moving forward
             pickUpQueue.sort(comparatorOnFloor);
+            // System.out.println("pickUpQueue: " + pickUpQueue);
             // get nearest request
-            System.out.println("pickUpQueue: " + pickUpQueue);
+            // System.out.println("pickUpQueue: " + pickUpQueue);
             if (pickUpQueue.size() > 0) {
                 newDealt = true;
 //                System.out.println("---pickUpQueue:" + pickUpQueue);
@@ -248,10 +253,10 @@ public class ElevatorScheduler {
                     } else {
                         printRequestDealt(pickUp, elevator.simuTime, status);
                         groupFinished.add(pickUp);
-                    }
-                    if (!(pickUpQueue.size() > 0 && pickUpQueue.getFirst().getTarget() == pickUp.getTarget())) {
-                        // increase door time only when cannot resolve them as a group
-                        elevator.simuTime += Elevator.DOOR_TIME;
+                        if (!(pickUpQueue.size() > 0 && pickUpQueue.getFirst().getTarget() == pickUp.getTarget())) {
+                            // increase door time only when cannot resolve them as a group
+                            elevator.simuTime += Elevator.DOOR_TIME;
+                        }
                     }
                 } else {
                     unfinishedList.add(pickUp);
@@ -277,12 +282,14 @@ public class ElevatorScheduler {
                     //System.out.println(elevator.mainRequest);
                     //System.out.println(elevator.nextMainRequest);
                     newRequest = waitingList.removeFirst();
+                    // System.out.println("removed: " + newRequest);
                     while (true) {
                         boolean same = judgeSameRequestOnEffect(elevator.lastMainRequest, newRequest);
                         if (same) {
                             printSameRequest(newRequest);
                             if (waitingList.size() > 0) {
                                 newRequest = waitingList.removeFirst();
+                                // System.out.println("removed: " + newRequest);
                             } else {
                                 return;
                             }
@@ -297,7 +304,7 @@ public class ElevatorScheduler {
                 elevator.simuTime = newRequest.time > elevator.simuTime ? newRequest.time : elevator.simuTime;
                 elevator.mainRequest = newRequest;
 
-                System.out.println("---mainRequest is: " + elevator.mainRequest);
+                // System.out.println("---mainRequest is: " + elevator.mainRequest);
 
                 // pickUpList.clear();
                 if (newRequest.getTarget() > elevator.position) {
@@ -335,7 +342,7 @@ public class ElevatorScheduler {
                     Iterator<Request> iterator = unfinishedList.iterator();
                     LinkedList<Request> groupFinished = new LinkedList<>();
                     boolean firstMain = false;
-                    System.out.println("unfinished: " + unfinishedList);
+                    // System.out.println("unfinished: " + unfinishedList);
                     // deal with requests sharing target with main request
                     int groupingCount = 0;
                     while (iterator.hasNext()) {
@@ -370,6 +377,7 @@ public class ElevatorScheduler {
                     for (int i = groupingCount; i < unfinishedList.size(); i++) {
                         if (unfinishedList.get(i) != nextMainRequest) {
                             waitingList.add(unfinishedList.get(i));
+                            // System.out.println("Added: " + unfinishedList.get(i));
                         }
                     }
 

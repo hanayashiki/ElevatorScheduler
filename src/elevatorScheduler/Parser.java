@@ -1,7 +1,5 @@
 package elevatorScheduler;
 
-import jdk.internal.util.xml.impl.Input;
-
 import java.text.NumberFormat;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
