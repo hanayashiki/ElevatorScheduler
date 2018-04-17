@@ -210,6 +210,7 @@ public class ElevatorScheduler {
     private ArrayList<Request> pickUp() {
         ArrayList<Request> unfinishedList = new ArrayList<>();
         LinkedList<Request> pickUpQueue = new LinkedList<>();
+        LinkedList<Request> groupFinished = new LinkedList<>();
         // System.out.println("Finding pick up for: " + elevator.mainRequest);
         while (true) {
             boolean newAdded = false;
@@ -233,22 +234,24 @@ public class ElevatorScheduler {
                 newDealt = true;
 //                System.out.println("---pickUpQueue:" + pickUpQueue);
                 Request pickUp = pickUpQueue.removeFirst();
-//                System.out.println("---to pickup:" + pickUp);
                 if ((status == Status.UP && pickUp.getTarget() < elevator.mainRequest.getTarget()) ||
                         (status == Status.DOWN && pickUp.getTarget() > elevator.mainRequest.getTarget())) {
                     elevator.simuTime += Math.abs(pickUp.getTarget() - elevator.position) / Elevator.SPEED;
                     elevator.position = pickUp.getTarget();
 //                    System.out.print("pick up: ");
-                    printRequestDealt(pickUp, elevator.simuTime, status);
+                    boolean same = false;
+                    for (Request r: groupFinished) {
+                        same = same | judgeSameRequestOnEffect(r, pickUp);
+                    }
+                    if (same) {
+                        printSameRequest(pickUp);
+                    } else {
+                        printRequestDealt(pickUp, elevator.simuTime, status);
+                        groupFinished.add(pickUp);
+                    }
                     if (!(pickUpQueue.size() > 0 && pickUpQueue.getFirst().getTarget() == pickUp.getTarget())) {
                         // increase door time only when cannot resolve them as a group
                         elevator.simuTime += Elevator.DOOR_TIME;
-                    }
-                    // check same
-                    for (Request r : pickUpQueue) {
-                        if (judgeSameRequestOnEffect(pickUp, r)) {
-                            printSameRequest(r);
-                        }
                     }
                 } else {
                     unfinishedList.add(pickUp);
@@ -330,15 +333,27 @@ public class ElevatorScheduler {
                     Request nextMainRequest = null;
                     unfinishedList.sort(comparatorOnFloor);
                     Iterator<Request> iterator = unfinishedList.iterator();
+                    LinkedList<Request> groupFinished = new LinkedList<>();
                     boolean firstMain = false;
                     System.out.println("unfinished: " + unfinishedList);
                     // deal with requests sharing target with main request
                     int groupingCount = 0;
                     while (iterator.hasNext()) {
                         Request request = iterator.next();
+                        boolean same = false;
+                        // judge same
+                        for (Request r: groupFinished) {
+                            same = same | judgeSameRequestOnEffect(r, request);
+                        }
+                        if (same) {
+                            groupingCount++;
+                            printSameRequest(request);
+                            continue;
+                        }
                         if (request.getTarget() == elevator.mainRequest.getTarget()) {
                             if (!judgeSameRequestOnEffect(elevator.mainRequest, request)) {
                                 printRequestDealt(request, elevator.simuTime - Elevator.DOOR_TIME, status);
+                                groupFinished.add(request);
                             } else {
                                 printSameRequest(request);
                             }

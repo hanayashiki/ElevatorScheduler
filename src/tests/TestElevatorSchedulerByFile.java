@@ -19,7 +19,7 @@ public class TestElevatorSchedulerByFile {
 		System.out.println(Parser.format((double)2147483647));
         System.out.println(Parser.format(2147483647.5));
 		try {
-			testFile = new FileInputStream("src/tests/testInputs/testUpDown.txt");
+			testFile = new FileInputStream("src/tests/testInputs/testOrder.txt");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
