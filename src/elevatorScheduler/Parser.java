@@ -21,7 +21,7 @@ public class Parser {
 		Matcher floorRequestMatcher = floorRequestPattern.matcher(requestLineTrimmed);
 		Matcher elevatorRequestMatcher = elevatorRequestPattern.matcher(requestLineTrimmed);
 		Request newRequest = null;
-		if (floorRequestMatcher.find()) {
+		if (floorRequestMatcher.find() && floorRequestMatcher.matches()) {
 			String directionString = floorRequestMatcher.group(2);
 			int from;
 			double time;
@@ -37,7 +37,7 @@ public class Parser {
 			}
 			newRequest = new FloorRequest(from, direction, time);
 		}
-		else if (elevatorRequestMatcher.find()) {
+		else if (elevatorRequestMatcher.find() && elevatorRequestMatcher.matches()) {
 			int target = Integer.parseInt(elevatorRequestMatcher.group(1));
 			double time = Integer.parseInt(elevatorRequestMatcher.group(2));
 			newRequest = new ElevatorRequest(target, time);

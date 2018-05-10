@@ -1,6 +1,6 @@
 (FR,1,UP,0)
 (fr,1,UP,0)
-(FR,1,up,0)
+(FR,1,up,0)))
 (FR,1,down,0)
 (((FR,1,up,0)
 FR,1,UP,0)

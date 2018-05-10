@@ -95,14 +95,16 @@ public class ElevatorScheduler {
                             && ((FloorRequest) request).direction == Direction.UP;
                 }
             } else {
-                predictPosition = -(int) ((request.time - elevator.simuTime) * Elevator.SPEED) + elevator.position;
-                accessible = predictPosition > nextRequest.getTarget();
-                if (request.type == Request.Type.FR) {
-                    accessible = accessible && request.getTarget() >= nextRequest.getTarget()
-                            && ((FloorRequest) request).direction == Direction.DOWN;
+                if (request.time > elevator.simuTime) {
+                    predictPosition = - (int) ((request.time - elevator.simuTime) * Elevator.SPEED) + elevator.position;
+                    accessible = predictPosition > request.getTarget();
                 } else {
                     accessible = elevator.position > request.getTarget();
                     // System.out.println(request.getTarget());
+                }
+                if (request.type == Request.Type.FR) {
+                    accessible = accessible && request.getTarget() >= nextRequest.getTarget()
+                            && ((FloorRequest) request).direction == Direction.UP;
                 }
             }
             if (accessible) {
@@ -253,10 +255,7 @@ public class ElevatorScheduler {
                     } else {
                         printRequestDealt(pickUp, elevator.simuTime, status);
                         groupFinished.add(pickUp);
-                        if (!(pickUpQueue.size() > 0 && pickUpQueue.getFirst().getTarget() == pickUp.getTarget())) {
-                            // increase door time only when cannot resolve them as a group
-                            elevator.simuTime += Elevator.DOOR_TIME;
-                        }
+                        elevator.simuTime += Elevator.DOOR_TIME;
                     }
                 } else {
                     unfinishedList.add(pickUp);
@@ -304,7 +303,7 @@ public class ElevatorScheduler {
                 elevator.simuTime = newRequest.time > elevator.simuTime ? newRequest.time : elevator.simuTime;
                 elevator.mainRequest = newRequest;
 
-                // System.out.println("---mainRequest is: " + elevator.mainRequest);
+                System.out.println("---mainRequest is: " + elevator.mainRequest);
 
                 // pickUpList.clear();
                 if (newRequest.getTarget() > elevator.position) {
